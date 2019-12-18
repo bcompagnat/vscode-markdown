@@ -66,7 +66,9 @@ async function print(type: string) {
     const config = workspace.getConfiguration('markdown.extension', doc.uri);
     const configToBase64 = config.get<boolean>('print.imgToBase64');
     const configAbsPath = config.get<boolean>('print.absoluteImgPath');
+    const configLinkAbsPath = config.get<boolean>('print.absoluteLinkPath');
     const imgTagRegex = /(<img[^>]+src=")([^"]+)("[^>]*>)/g;  // Match '<img...src="..."...>'
+    const linkTagRegex = /(<a[^>]*href=")([^"]+)(">[^<]+<\/a>)/g;  // Match '<p> .. <a href="...">...</a> .. </p>'
 
     if (configToBase64) {
         body = body.replace(imgTagRegex, function (_, p1, p2, p3) {
@@ -90,14 +92,25 @@ async function print(type: string) {
             }
         });
     } else if (configAbsPath) {
-        body = body.replace(imgTagRegex, function (_, p1, p2, p3) {
-            if (p2.startsWith('http') || p2.startsWith('data:')) {
+        body = body.replace(imgTagRegex, function (_, p1, p2, p3, p5) {
+            if (p2.startsWith('http') || p2.startsWith('data:') || p2.startsWith('#')) {
                 return _;
             }
 
             const imgSrc = relToAbsPath(doc.uri, p2);
             // Absolute paths need `file:///` but relative paths don't
             return `${p1}file:///${imgSrc}${p3}`;
+        });
+    }
+    if(configLinkAbsPath) {
+        body = body.replace(linkTagRegex, function (_, p1, p2, p3) {
+            if (p2.startsWith('http') || p2.startsWith('data:')) {
+                return _;
+            }
+
+            const linkSrc = relToAbsPath(doc.uri, p2);
+            // Absolute paths need `file:///` but relative paths don't
+            return `${p1}file:///${linkSrc}${p3}`;
         });
     }
 

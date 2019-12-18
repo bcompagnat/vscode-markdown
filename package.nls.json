@@ -30,6 +30,7 @@
     "config.tableFormatter.normalizeIndentation.description": "Normalize table indentation to closest multiple of configured tabSize",
     "config.print.absoluteImgPath.description": "Convert image path to absolute path",
     "config.print.imgToBase64.description": "Convert images to base64 when printing to HTML",
+    "config.print.absoluteLinkPath.description": "Convert links path to absolute path when printing to HTML",
     "config.print.onFileSave.description": "Print current document to HTML when file is saved",
     "config.print.validateUrls.description": "Enable/disable URL validation when printing",
     "config.print.theme": "Theme of the exported HTML",
